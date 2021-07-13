@@ -23,7 +23,7 @@
         name: "GnssComponent",
         data() {
             return {
-                apiUrl: 'http://localhost:8080/api/files/',
+                apiUrl: 'http://lab-gnss.bmstu.ru/api/files/',
                 date: null
             };
         },
