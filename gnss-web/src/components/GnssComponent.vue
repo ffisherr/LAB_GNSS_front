@@ -72,7 +72,7 @@
             },
             downloadFile(fileId, fileName) {
                 axios({
-                    url: this.apiUrl + '/' + fileId + '/',
+                    url: this.apiUrl + fileId + '/',
                     method: 'GET',
                     responseType: 'blob',
                 }).then((response) => {
