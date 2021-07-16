@@ -14,7 +14,7 @@
 
 <script>
     import Vuetable from 'vuetable-2';
-
+    import axios from 'axios';
 
     export default {
         components: {
@@ -24,26 +24,34 @@
         data() {
             return {
                 apiUrl: 'http://lab-gnss.bmstu.ru/api/files/',
-                date: null
+                date: null,
+                step: 'chooseYear',
             };
         },
         methods: {
             onCellClicked(data) {
+                console.log(data);
+                if (this.step === 'downloadFile')  {
+                    this.downloadFile(data.data.id, data.data.name);
+                    return;
+                }
                 this.date = data.data;
                 if (this.date.year && !this.date.month) {
                     this.$refs.vuetable.apiUrl = this.apiUrl + this.date.year + '/months/';
                     this.$refs.vuetable.fields = ['year', 'month'];
+                    this.step = 'chooseMonth';
                 } else if (this.date.year && this.date.month && !this.date.day) {
                     this.$refs.vuetable.apiUrl = this.apiUrl + this.date.year + '/' + this.date.month + "/days/";
                     this.$refs.vuetable.fields = ['year', 'month', 'day'];
+                    this.step = 'chooseDay';
                 } else if (this.date.year && this.date.month && this.date.day) {
                     this.$refs.vuetable.apiUrl = this.apiUrl + this.date.year + '/' + this.date.month + "/" + this.date.day + "/";
                     this.$refs.vuetable.fields = ['id', 'name', 'year', 'month', 'day'];
+                    this.step = 'downloadFile';
                 }
                 this.$refs.vuetable.refresh();
             },
-            onBtnClicked( ) {
-                console.log("Clicked");
+            onBtnClicked() {
                 if (this.date.year && this.date.month && this.date.day) {
                     this.date.day = null;
                     this.$refs.vuetable.apiUrl = this.apiUrl + this.date.year + '/' + this.date.month + "/days/";
@@ -61,7 +69,20 @@
                     this.$refs.vuetable.fields = ['year'];
                 }
                 this.$refs.vuetable.refresh();
-
+            },
+            downloadFile(fileId, fileName) {
+                axios({
+                    url: this.apiUrl + '/' + fileId + '/',
+                    method: 'GET',
+                    responseType: 'blob',
+                }).then((response) => {
+                    const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+                    const fileLink = document.createElement('a');
+                    fileLink.href = fileURL;
+                    fileLink.setAttribute('download', fileName);
+                    document.body.appendChild(fileLink);
+                    fileLink.click();
+                });
             }
         }
 
