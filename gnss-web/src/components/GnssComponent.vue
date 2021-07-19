@@ -30,7 +30,6 @@
         },
         methods: {
             onCellClicked(data) {
-                console.log(data);
                 if (this.step === 'downloadFile')  {
                     this.downloadFile(data.data.id, data.data.name);
                     return;
@@ -52,22 +51,29 @@
                 this.$refs.vuetable.refresh();
             },
             onBtnClicked() {
+                let fields = [];
+                let link = this.apiUrl;
                 if (this.date.year && this.date.month && this.date.day) {
+                    this.step = 'chooseDay';
                     this.date.day = null;
-                    this.$refs.vuetable.apiUrl = this.apiUrl + this.date.year + '/' + this.date.month + "/days/";
-                    this.$refs.vuetable.fields = ['year', 'month', 'day'];
+                    link = this.apiUrl + this.date.year + '/' + this.date.month + "/days/";
+                    fields = ['year', 'month', 'day'];
                 } else if (this.date.year && this.date.month && !this.date.day) {
+                    this.step = 'chooseMonth';
                     this.date.day = null;
                     this.date.month = null
-                    this.$refs.vuetable.apiUrl = this.apiUrl + this.date.year + '/months/';
-                    this.$refs.vuetable.fields = ['year', 'month'];
+                    link = this.apiUrl + this.date.year + '/months/';
+                    fields = ['year', 'month'];
                 } else if (this.date.year && !this.date.month && !this.date.day) {
+                    this.step = 'chooseYear';
                     this.date.day = null;
                     this.date.month = null
                     this.date.year = null;
-                    this.$refs.vuetable.apiUrl = this.apiUrl + '/years/';
-                    this.$refs.vuetable.fields = ['year'];
+                    link = this.apiUrl + '/years/';
+                    fields = ['year'];
                 }
+                this.$refs.vuetable.apiUrl = link;
+                this.$refs.vuetable.fields = fields;
                 this.$refs.vuetable.refresh();
             },
             downloadFile(fileId, fileName) {
